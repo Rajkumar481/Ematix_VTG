@@ -46,6 +46,7 @@ import {
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import UpdatePatientDetailsModal from "../components/UpdatePatientDetailsModal";
+import customFetch from "../utils/customFetch";
 
 const PatientDetailsDashboard = () => {
   const location = useLocation();
@@ -79,8 +80,8 @@ const PatientDetailsDashboard = () => {
   const refreshDetails = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `http://localhost:5000/api/details/bypatient/${patientId}`
+      const res = await customFetch.get(
+        `/details/bypatient/${patientId}`
       );
       await new Promise((resolve) => setTimeout(resolve, 500));
       setDetails(res.data);
@@ -94,8 +95,8 @@ const PatientDetailsDashboard = () => {
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/details/bypatient/${patientId}`
+        const res = await customFetch.get(
+          `/details/bypatient/${patientId}`
         );
         await new Promise((resolve) => setTimeout(resolve, 1500));
         setDetails(res.data);

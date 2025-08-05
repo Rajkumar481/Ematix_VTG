@@ -472,6 +472,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import customFetch from "../utils/customFetch";
 
 const initialTreatmentState = {
   treatmentName: "",
@@ -516,7 +517,7 @@ export default function PatientList() {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients");
+      const res = await customFetch.get("/patients");
       setPatients(res.data);
     } catch (err) {
       console.error("Error fetching patients:", err);
@@ -531,7 +532,7 @@ export default function PatientList() {
   const handleDelete = async (_id) => {
     if (window.confirm("Are you sure to delete?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/patients/${_id}`);
+        await customFetch.delete(`/patients/${_id}`);
         fetchPatients();
       } catch (err) {
         console.error("Error deleting patient:", err);

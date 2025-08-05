@@ -211,35 +211,34 @@ const UpdatePatientDetailsModal = ({ open, handleClose, detail, refresh }) => {
     setError(null);
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("patient", detail.patient._id);
+  const formDataToSend = new FormData();
+  formDataToSend.append("patient", detail.patient._id);
 
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
+  Object.entries(formData).forEach(([key, value]) => {
+    formDataToSend.append(key, value);
+  });
 
-      newImages.forEach((file) => {
-        formDataToSend.append("images", file);
-      });
+  newImages.forEach((file) => {
+    formDataToSend.append("images", file);
+  });
 
-      const response = await fetch(
-        `http://localhost:5000/api/details/${detail._id}`,
-        {
-          method: "PATCH",
-          body: formDataToSend,
-        }
-      );
+  const response = await customFetch.patch(
+    `/details/${detail._id}`,
+    formDataToSend,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
-      if (!response.ok) {
-        throw new Error("Update failed");
-      }
-
-      setSuccess(true);
-      setTimeout(() => {
-        refresh();
-        handleClose();
-      }, 1500);
-    } catch (err) {
+  setSuccess(true);
+  setTimeout(() => {
+    refresh();
+    handleClose();
+  }, 1500);
+} 
+catch (err) {
       console.error(err);
       setError("Failed to update patient details. Please try again.");
     } finally {

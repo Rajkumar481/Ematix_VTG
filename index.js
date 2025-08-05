@@ -29,9 +29,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Serve static files from Cloudinary uploads if any local storage is used
 
 // Routes
-app.use("/api/patients", patientRoutes);
-app.use("/api/details", detailsRoutes);
-app.use("/api/backup", BackupRoutes);
+app.use("/api/v1/patients", patientRoutes);
+app.use("/api/v1/details", detailsRoutes);
+app.use("/api/v1/backup", BackupRoutes);
 
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, "frontend/dist", "index.html"));

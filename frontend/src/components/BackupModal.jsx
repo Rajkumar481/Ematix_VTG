@@ -29,6 +29,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import dayjs from "dayjs";
+import customFetch from "../utils/customFetch";
 
 const BackupModal = ({ open, onClose }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -81,110 +82,90 @@ const BackupModal = ({ open, onClose }) => {
     }, 5000);
   };
 
-  const handleDownload = async (url, filename) => {
-    try {
-      setLoading(true);
-      const response = await fetch(url);
+const handleDownload = async (url, filename) => {
+  try {
+    setLoading(true);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+    const response = await customFetch.get(url, {
+      responseType: "blob",
+    });
 
-      const contentType = response.headers.get("Content-Type");
-      if (!contentType?.includes("application/zip")) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Invalid response format");
-      }
-
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(link.href);
-
-      showMessage("Backup downloaded successfully!", true);
-    } catch (error) {
-      console.error("Download error:", error);
-      showMessage(
-        `Download failed: ${error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setLoading(false);
+    const contentType = response.headers["content-type"];
+    if (!contentType.includes("application/zip")) {
+      throw new Error("Invalid file type received");
     }
-  };
 
-  const handleBackup = async () => {
-    if (!validateDates()) return;
+    const blob = response.data;
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(link.href);
 
-    const url = `http://localhost:5000/api/backup/by-date?start=${startDate}&end=${endDate}`;
-    await handleDownload(url, `patient_backup_${startDate}_to_${endDate}.zip`);
-  };
+    showMessage("Backup downloaded successfully!", true);
+  } catch (error) {
+    console.error("Download error:", error);
+    showMessage(`Download failed: ${error?.message || "Unknown error"}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleFullBackup = async () => {
-    const url = `http://localhost:5000/api/backup/all`;
-    await handleDownload(
-      url,
-      `full_backup_${dayjs().format("YYYY-MM-DD")}.zip`
+
+const handleBackup = async () => {
+  if (!validateDates()) return;
+
+  const url = `/backup/by-date?start=${startDate}&end=${endDate}`;
+  await handleDownload(url, `patient_backup_${startDate}_to_${endDate}.zip`);
+};
+
+const handleFullBackup = async () => {
+  const url = `/backup/all`;
+  await handleDownload(url, `full_backup_${dayjs().format("YYYY-MM-DD")}.zip`);
+};
+
+
+ const handleDeleteByDate = async () => {
+  if (!validateDates()) return;
+
+  try {
+    setLoading(true);
+
+    const response = await customFetch.delete(
+      `/backup/delete/by-date?start=${startDate}&end=${endDate}`
     );
-  };
 
-  const handleDeleteByDate = async () => {
-    if (!validateDates()) return;
+    showMessage(response.data.message || "Images deleted successfully.", true);
+  } catch (error) {
+    console.error("Delete error:", error);
+    showMessage(
+      `Delete failed: ${error?.response?.data?.message || error.message}`
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://localhost:5000/api/backup/delete/by-date?start=${startDate}&end=${endDate}`,
-        { method: "DELETE" }
-      );
 
-      const data = await response.json();
-      if (response.ok) {
-        showMessage(data.message || "Images deleted successfully.", true);
-      } else {
-        throw new Error(data.message || "Delete operation failed");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      showMessage(
-        `Delete failed: ${error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleFullDelete = async () => {
+  try {
+    setLoading(true);
 
-  const handleFullDelete = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://localhost:5000/api/backup/delete/all`,
-        {
-          method: "DELETE",
-        }
-      );
+    const response = await customFetch.delete(`/backup/delete/all`);
 
-      const data = await response.json();
-      if (response.ok) {
-        showMessage(data.message || "All images deleted successfully.", true);
-      } else {
-        throw new Error(data.message || "Delete operation failed");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      showMessage(
-        `Delete failed: ${error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    showMessage(response.data.message || "All images deleted successfully.", true);
+  } catch (error) {
+    console.error("Delete error:", error);
+    showMessage(
+      `Delete failed: ${error?.response?.data?.message || error.message}`
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const openConfirmDialog = (type, title, message) => {
     setConfirmDialog({ open: true, type, title, message });

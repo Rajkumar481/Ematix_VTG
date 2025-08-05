@@ -17,6 +17,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isToday from "dayjs/plugin/isToday";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import customFetch from "../utils/customFetch";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isToday);
@@ -45,7 +46,7 @@ const PatientStatusSummary = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/details");
+      const res = await customFetch.get("/details");
       const data = res.data;
 
       const clearedList = [];

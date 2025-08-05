@@ -35,6 +35,7 @@ import {
   Close,
   ZoomIn,
 } from "@mui/icons-material";
+import customFetch from "../utils/customFetch";
 
 const PatientImageDetails = () => {
   const { id: patientId } = useParams();
@@ -50,8 +51,8 @@ const PatientImageDetails = () => {
     const fetchPatientDetails = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
-          `http://localhost:5000/api/details/${patientId}`
+        const res = await customFetch.get(
+          `/details/${patientId}`
         );
         await new Promise((resolve) => setTimeout(resolve, 1500));
         setDetails(res.data);

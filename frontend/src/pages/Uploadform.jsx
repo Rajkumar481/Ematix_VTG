@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import customFetch from "../utils/customFetch";
 
 const AddPatientDetails = () => {
   const location = useLocation();
@@ -72,7 +73,7 @@ const AddPatientDetails = () => {
         data.append("images", img);
       });
 
-      const res = await axios.post("http://localhost:5000/api/details", data, {
+      const res = await customFetch.post("/details", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

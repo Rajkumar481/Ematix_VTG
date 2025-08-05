@@ -163,6 +163,7 @@ import {
   FaHeartbeat,
 } from "react-icons/fa";
 import { TextField, Autocomplete } from "@mui/material";
+import customFetch from "../utils/customFetch";
 
 const initialState = {
   name: "",
@@ -211,7 +212,7 @@ const Addpatient = () => {
     const finalDiagnosis = existing.join(", ");
 
     try {
-      await axios.post("http://localhost:5000/api/patients", {
+      await customFetch.post("/patients", {
         ...formData,
         diagnosis: finalDiagnosis,
       });

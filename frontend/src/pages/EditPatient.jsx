@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { TextField, Autocomplete } from "@mui/material";
 import { toast } from "react-toastify";
+import customFetch from "../utils/customFetch";
 
 const iconMap = {
   name: <FaUserAlt />,
@@ -86,8 +87,8 @@ const EditPatient = () => {
     };
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/patients/${patient._id}`,
+      await customFetch.put(
+        `patients/${patient._id}`,
         payload
       );
       toast.success("Patient updated successfully!");

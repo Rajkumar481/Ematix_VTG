@@ -68,6 +68,7 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays } from "lucide-react";
+import customFetch from "../utils/customFetch";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Dashboard = () => {
 
   const fetchData = async (date) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/details");
+      const response = await customFetch.get("/details");
 
       // Filter based on nextVisit date (not time)
       const filtered = response.data.filter((entry) => {
